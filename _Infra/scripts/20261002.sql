@@ -15,12 +15,19 @@ left join
 order by t1.name;
 
 -- 2. Есть ли пустые пачки
--- Ищем пачки, у которых вообще нет параметров, и смотрим чьи они
+-- Сначала группируем параметры по коду пачки, потом цепляем к пачкам через left join.
+-- Если для пачки в группировке ничего нет, значит она пустая. Заодно смотрим, чья она
 select t1.id as batch_id, t1.started, t3.name as fio
 from public.measurement_batchs as t1
-left join public.measurement_input_params as t2 on t2.measurement_batch_id = t1.id
+left join
+(
+    -- Подзапрос
+    select measurement_batch_id, count(*) as cnt_records
+    from public.measurement_input_params
+    group by measurement_batch_id
+) as inner_t2 on t1.id = inner_t2.measurement_batch_id
 inner join public.employees as t3 on t3.id = t1.employee_id
-where t2.id is null
+where inner_t2.measurement_batch_id is null
 order by t1.id;
 
 -- 3. У всех ли пачек по 5 параметров
@@ -50,27 +57,31 @@ order by t1.id;
 -- 4 Направление ветра: 0..59
 -- 5 Скорость ветра: 0..15
 -- 6 Дальность сноса пуль: 0..150
--- 1 Высота: в ТЗ границ нет, поэтомуне проверяем
+-- 1 Высота: в ТЗ границ нет, поэтому ее не проверяем
+-- В подзапросе только плохие значения, а left join показывает все пачки:
+-- у кого есть плохое значение, там будет "Некорректно", у остальных "Корректно"
 select t1.id as batch_id, t1.started,
-inner_t2.measurement_parameter_type_id, t3.name as parameter_name,
-inner_t2.measurement_value
+       coalesce(inner_t2.check_result, 'Корректно') as check_result,
+       inner_t2.parameter_name, inner_t2.measurement_value
 from public.measurement_batchs as t1
-inner join
+left join
 (
     -- Подзапрос
-    select measurement_batch_id, measurement_parameter_type_id, measurement_value
-    from public.measurement_input_params
-    where (measurement_parameter_type_id = 2 and (measurement_value < -58 or measurement_value > 58))
-       or (measurement_parameter_type_id = 3 and (measurement_value < 500 or measurement_value > 900))
-       or (measurement_parameter_type_id = 4 and (measurement_value < 0   or measurement_value > 59))
-       or (measurement_parameter_type_id = 5 and (measurement_value < 0   or measurement_value > 15))
-       or (measurement_parameter_type_id = 6 and (measurement_value < 0   or measurement_value > 150))
+    select t2.measurement_batch_id, t3.name as parameter_name, t2.measurement_value,
+           cast('Некорректно' as varchar(20)) as check_result
+    from public.measurement_input_params as t2
+    inner join public.measurement_parameter_types as t3 on t3.id = t2.measurement_parameter_type_id
+    where (t2.measurement_parameter_type_id = 2 and (t2.measurement_value < -58 or t2.measurement_value > 58))
+       or (t2.measurement_parameter_type_id = 3 and (t2.measurement_value < 500 or t2.measurement_value > 900))
+       or (t2.measurement_parameter_type_id = 4 and (t2.measurement_value < 0   or t2.measurement_value > 59))
+       or (t2.measurement_parameter_type_id = 5 and (t2.measurement_value < 0   or t2.measurement_value > 15))
+       or (t2.measurement_parameter_type_id = 6 and (t2.measurement_value < 0   or t2.measurement_value > 150))
 ) as inner_t2 on t1.id = inner_t2.measurement_batch_id
-inner join public.measurement_parameter_types as t3 on t3.id = inner_t2.measurement_parameter_type_id
 order by t1.id;
 
 -- 5. Правильные ли единицы измерения у параметров
--- Выводим только те параметры, где единица не совпала или вообще не указана
+-- Какая единица должна быть, прописываем сами через case по ТЗ,
+-- и выводим только те параметры, где единица не совпала или вообще не указана
 select * from
 (
     -- Подзапрос
