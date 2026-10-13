@@ -4,6 +4,7 @@
 -- Транзакция 1. Таблицы и счетчики
 do $$
 begin
+begin
 	-- Удаляем старое
 	drop table if exists public.measurement_input_params cascade;
 	drop table if exists public.measurement_batchs cascade;
@@ -153,12 +154,12 @@ begin
 	comment on column public.virtual_temperature_corrections.correction is 'Виртуальная поправка';
 
 	raise notice 'Транзакция 1: таблицы и счетчики созданы';
-end $$;
+end;
+commit;
 
 
 
 -- Транзакция 2. Тестовые данные
-do $$
 begin
 	insert into public.base_units(id, name)
 	values
@@ -253,11 +254,11 @@ begin
 	perform setval('public.seq_virtual_temperature_corrections', (select max(id) from public.virtual_temperature_corrections));
 
 	raise notice 'Транзакция 2: тестовые данные добавлены';
-end $$;
+end;
+commit;
 
 
 -- Транзакция 3. Ограничения и связи
-do $$
 begin
 	-- Обязательные поля
 	alter table public.base_units alter column id set not null;
@@ -333,4 +334,6 @@ begin
 		add constraint ck_temperature_corrections_value check (correction >= 0);
 
 	raise notice 'Транзакция 3: ограничения и связи созданы';
+	end;
+	commit;
 end $$;
