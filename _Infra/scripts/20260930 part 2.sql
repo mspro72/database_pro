@@ -54,47 +54,95 @@ values
 (19, 2, 2, '2026-08-19 13:00:00'),
 (20, 2, 2, '2026-08-20 13:15:00');
 
--- 4. Наполняем таблицу параметров (ровно по 10 измерений на тип)
-
--- 4.1. Параметры для ДМК (Equipment ID = 1)
--- Используем типы: 1(Высота), 2(Температура), 3(Давление), 4(Направление), 5(Скорость)
-
--- Высота (type_id=1)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id, id, 1, (100 + id * 5)::numeric(10,2) from measurment_batchs where id between 1 and 10;
-
--- Температура (type_id=2)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id + 100, id, 2, (10 + (id % 10) * 1.5)::numeric(10,2) from measurment_batchs where id between 1 and 10;
-
--- Давление (type_id=3)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id + 200, id, 3, (1010 + (id % 10) * 2.1)::numeric(10,2) from measurment_batchs where id between 1 and 10;
-
--- Направление ветра (type_id=4)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id + 300, id, 4, (id * 30 % 360)::numeric(10,2) from measurment_batchs where id between 1 and 10;
-
--- Скорость ветра (type_id=5)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id + 400, id, 5, (2 + (id % 10) * 0.8)::numeric(10,2) from measurment_batchs where id between 1 and 10;
-
-
--- 4.2. Параметры для ВР (Equipment ID = 2)
--- Используем типы: 4(Направление), 5(Скорость), 6(Дальность)
-
--- Направление ветра (type_id=4)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id + 500, id, 4, (id * 25 % 360)::numeric(10,2) from measurment_batchs where id between 11 and 20;
-
--- Скорость ветра (type_id=5)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id + 600, id, 5, (5 + (id % 10) * 1.2)::numeric(10,2) from measurment_batchs where id between 11 and 20;
-
--- Дальность сноса пуль (type_id=6)
-insert into measurment_input_params(id, measurment_batch_id, measurement_parameter_type_id, measurement_value)
-select id + 700, id, 6, (100 + (id % 10) * 15.5)::numeric(10,2) from measurment_batchs where id between 11 and 20;
-
+insert into measurment_input_params (id, measurment_batch_id, measurement_parameter_type_id, measurement_value) values
+(1, 1, 1, 100.00),
+(2, 1, 2, 85.00),
+(3, 1, 3, 760.00),
+(4, 1, 4, 30.00),
+(5, 1, 5, 5.00),
+(6, 2, 1, 100.00),
+(7, 2, 2, 20.00),
+(8, 2, 3, 760.00),
+(9, 2, 4, 30.00),
+(10, 3, 1, 100.00),
+(11, 3, 2, -90.00),
+(12, 3, 3, 760.00),
+(13, 3, 4, 30.00),
+(14, 3, 5, 5.00),
+(15, 5, 1, 100.00),
+(16, 5, 2, 20.00),
+(17, 5, 3, 760.00),
+(18, 5, 4, 30.00),
+(19, 5, 5, 40.00),
+(20, 6, 1, 100.00),
+(21, 6, 2, 20.00),
+(22, 6, 3, 1013.00),
+(23, 6, 4, 30.00),
+(24, 6, 5, 5.00),
+(25, 7, 2, 20.00),
+(26, 7, 3, 760.00),
+(27, 7, 4, 30.00),
+(28, 7, 5, 5.00),
+(29, 8, 1, 100.00),
+(30, 8, 2, 20.00),
+(31, 8, 3, 120.00),
+(32, 8, 4, 30.00),
+(33, 8, 5, 5.00),
+(34, 9, 1, 100.00),
+(35, 9, 2, 20.00),
+(36, 9, 2, 25.00),
+(37, 9, 3, 760.00),
+(38, 9, 4, 30.00),
+(39, 9, 5, 5.00),
+(40, 10, 1, 100.00),
+(41, 10, 2, 20.00),
+(42, 10, 3, 760.00),
+(43, 10, 4, 30.00),
+(44, 10, 5, -3.00),
+(45, 11, 1, 100.00),
+(46, 11, 2, 20.00),
+(47, 11, 3, 760.00),
+(48, 11, 4, 75.00),
+(49, 11, 6, 50.00),
+(50, 12, 1, 100.00),
+(51, 12, 2, 20.00),
+(52, 12, 3, 760.00),
+(53, 12, 4, 30.00),
+(54, 12, 6, 50.00),
+(55, 13, 1, 100.00),
+(56, 13, 2, 20.00),
+(57, 13, 3, 760.00),
+(58, 13, 4, -5.00),
+(59, 13, 6, 50.00),
+(60, 15, 1, 100.00),
+(61, 15, 2, 20.00),
+(62, 15, 3, 760.00),
+(63, 15, 4, 30.00),
+(64, 15, 6, 300.00),
+(65, 16, 1, 100.00),
+(66, 16, 2, 20.00),
+(67, 16, 3, 760.00),
+(68, 16, 4, 30.00),
+(69, 17, 1, 100.00),
+(70, 17, 2, 20.00),
+(71, 17, 3, 760.00),
+(72, 17, 4, 30.00),
+(73, 17, 6, 50.00),
+(74, 18, 1, 100.00),
+(75, 18, 2, 20.00),
+(76, 18, 3, 760.00),
+(77, 18, 4, 30.00),
+(78, 18, 6, 50.00),
+(79, 19, 1, 100.00),
+(80, 19, 2, 20.00),
+(81, 19, 3, 760.00),
+(82, 19, 4, 30.00),
+(83, 19, 6, 50.00),
+(84, 20, 1, 100.00),
+(85, 20, 2, 20.00),
+(86, 20, 3, 760.00),
+(87, 20, 4, 30.00),
+(88, 20, 6, 50.00);
 
 -- Наименование иаблиц меняем
 alter table public.measurment_batchs rename to measurement_batchs;
