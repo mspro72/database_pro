@@ -24,6 +24,18 @@ create table dim_ranges
     date_add timestamp default now()
 );
 
+-- базовые ед. измерения
+create sequence seq_dim_base_ranges;
+create table dim_base_ranges
+(
+    id bigint primary key default nextval('public.seq_dim_base_ranges'),
+    external_id bigint unique not null,
+    group_id bigint,
+    short_name text,
+    name text,
+    date_add timestamp default now()
+);
+
 -- поставщики external_id = 0 это Без поставщика
 create sequence seq_dim_vendors;
 create table dim_vendors
@@ -55,10 +67,6 @@ create table dim_product
     external_id bigint unique not null,
     productid text,
     product_name text,
-    category_id bigint,
-    category_name text,
-    size_id bigint,
-    size_name text,
     date_add timestamp default now()
 );
 
@@ -69,17 +77,6 @@ create table dim_personnel
     id bigint primary key default nextval('public.seq_dim_personnel'),
     external_id bigint unique not null,
     fullname text,
-    date_add timestamp default now()
-);
-
--- типы дейсвий
-create sequence seq_dim_transtype;
-create table dim_transtype
-(
-    id  bigint primary key default nextval('public.seq_dim_transtype'),
-    external_id bigint unique not null,
-    transgroupid bigint,
-    transtype_name text,
     date_add timestamp default now()
 );
 
